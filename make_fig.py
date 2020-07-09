@@ -52,8 +52,13 @@ for i in range(ntot):
     ideal.append(initial - i * rate)
 
 ## create graph
-fig = go.Figure(go.Scatter(x=dates, y=burndown, name='Completed'))
-fig.add_scatter(x=dates, y=burndown_rev, name='Review+Completed')
-fig.add_scatter(x=dates, y=ideal, name='Ideal')
+fig = go.Figure(go.Scatter(x=dates, y=burndown, name='Completed',
+                line_color='red', mode="lines+markers"),
+                layout_yaxis_title='Points')
+                #layout_title_text='Sprint Burndown'
+fig.add_scatter(x=dates, y=ideal, name='Completed (Ideal)',
+                line_color='green', mode="lines")
+fig.add_scatter(x=dates, y=burndown_rev, name='Review+Completed',
+                line=dict(color='blue', width=1, dash='dash'))
 fig.update_layout(showlegend=True)
 fig.write_html('burndown-points.html')
