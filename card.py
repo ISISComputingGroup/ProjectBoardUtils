@@ -24,7 +24,8 @@ WORKFLOW_COLUMNS = ['Bucket', 'Ready', 'In Progress', 'Review',
                     'Review Complete', 'Done', 'Impeded']
 POINTSUM_COLUMNS = ['Ready', 'In Progress', 'Review', 'Review Complete',
                     'Impeded']
-ZERO_POINT_LABELS = {'training', 'HLM', 'Cryomagnet', 'Friday', 'standdown'}
+ZERO_POINT_LABELS = {'training', 'HLM', 'Cryomagnet', 'Friday',
+                     'Datastreaming', 'standdown'}
 NO_POINT_LABELS = {'support', 'duplicate', 'sub-ticket'}
 
 NUM_ERROR = 0
