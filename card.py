@@ -6,6 +6,7 @@ import sys
 import json
 import argparse
 from statistics import mode
+import datetime
 from datetime import date
 from github import Github, Issue
 from local_defs import GITHUB_TOKEN
@@ -64,6 +65,20 @@ def check_column_label(labels, label, issue):
     check_labels(labels, [label], issue, True)
     no_labels = [x for x in WORKFLOW_LABELS if x != label]
     check_labels(labels, no_labels, issue, False)
+
+def check_review_length(issue):
+    created = None
+    for event in issue.get_events(): # or get_timeline() and '
+#        if event.event == 'moved_columns_in_project' and event.column_name == 'Review':
+#            print(event.created_at)
+        if event.event == 'labeled' and event.label.name == 'review':
+            created = event.created_at
+    if created is not None:
+        dur = datetime.datetime.now() - created
+        if dur > datetime.timedelta(7):
+            print('ERROR: Issue {} has been in review for {} days'.format(issue.number, dur.days))
+
+
 
 g = Github(GITHUB_TOKEN)
 repo = g.get_repo("ISISComputingGroup/IBEX")
@@ -170,6 +185,7 @@ for column in columns:
                 check_column_label(labels, 'in progress', issue)
             if column.name == 'Review':
                 check_column_label(labels, 'review', issue)
+                check_review_length(issue)
             if column.name == 'Review Complete':
                 check_column_label(labels, 'completed', issue)
             if column.name == 'Done':
@@ -207,6 +223,7 @@ print("INFO: Current milestone is {} and has {} open and {} closed issues".forma
 try:
     ms_dict = json.loads(current_milestone.description)
 except:
+    ms_dict = {}
     ms_dict['SP'] = 0
 
 with open('milestone.json', 'w') as f:
