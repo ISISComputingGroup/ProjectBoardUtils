@@ -76,7 +76,7 @@ def check_review_length(issue):
     if created is not None:
         dur = datetime.datetime.now() - created
         if dur > datetime.timedelta(7):
-            print('ERROR: Issue {} has been in review for {} days'.format(issue.number, dur.days))
+            print_error('ERROR: Issue {} has been in review for {} days'.format(issue.number, dur.days))
 
 
 
