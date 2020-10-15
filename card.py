@@ -66,17 +66,17 @@ def check_column_label(labels, label, issue):
     no_labels = [x for x in WORKFLOW_LABELS if x != label]
     check_labels(labels, no_labels, issue, False)
 
-def check_review_length(issue):
+def check_if_stale(issue, label_name, days_allowed):
     created = None
     for event in issue.get_events(): # or get_timeline() and '
 #        if event.event == 'moved_columns_in_project' and event.column_name == 'Review':
 #            print(event.created_at)
-        if event.event == 'labeled' and event.label.name == 'review':
+        if event.event == 'labeled' and event.label.name == label_name:
             created = event.created_at
     if created is not None:
         dur = datetime.datetime.now() - created
-        if dur > datetime.timedelta(7):
-            print_error('ERROR: Issue {} has been in review for {} days'.format(issue.number, dur.days))
+        if dur > datetime.timedelta(days_allowed):
+            print_error('ERROR: Issue {} has been in {} for {} days'.format(issue.number, label_name, dur.days))
 
 
 
@@ -126,6 +126,8 @@ for column in columns:
             labels = set()
             in_rework = False
             added_during_sprint = False
+            in_progress = False
+            ready = False
             for label in issue.labels:
                 labels.add(label.name)
                 if label.name == "under review":
@@ -135,6 +137,10 @@ for column in columns:
                     in_rework = True
                 if label.name == "added during sprint":
                     added_during_sprint = True
+                if label.name == "in progress":
+                    in_progress = True
+                if label.name == "ready":
+                    ready = True
                 if label.name.isdigit():
                     if found_size:
                         print_error("ERROR: issue {} has multiple sizes (assigned: {})".format(issue.number, assigned))
@@ -181,11 +187,13 @@ for column in columns:
             if column.name == 'Ready':
                 check_column_label(labels, 'ready', issue)
                 check_labels(labels, ['proposal'], issue, False)
+                check_if_stale(issue, 'rework', 7)
             if column.name == 'In Progress':
                 check_column_label(labels, 'in progress', issue)
+                check_if_stale(issue, 'in progress', 7)
             if column.name == 'Review':
                 check_column_label(labels, 'review', issue)
-                check_review_length(issue)
+                check_if_stale(issue, 'review', 7)
             if column.name == 'Review Complete':
                 check_column_label(labels, 'completed', issue)
             if column.name == 'Done':
