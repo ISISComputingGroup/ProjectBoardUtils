@@ -66,7 +66,7 @@ def check_column_label(labels, label, issue):
     no_labels = [x for x in WORKFLOW_LABELS if x != label]
     check_labels(labels, no_labels, issue, False)
 
-def check_if_stale(issue, label_name, days_allowed):
+def check_if_stale(issue, label_name, days_allowed, assigned):
     created = None
     for event in issue.get_events(): # or get_timeline() and '
 #        if event.event == 'moved_columns_in_project' and event.column_name == 'Review':
@@ -76,7 +76,7 @@ def check_if_stale(issue, label_name, days_allowed):
     if created is not None:
         dur = datetime.datetime.now() - created
         if dur > datetime.timedelta(days_allowed):
-            print_error('ERROR: Issue {} has been in {} for {} days'.format(issue.number, label_name, dur.days))
+            print_error('ERROR: Issue {} has been in {} for {} days (assigned: {})'.format(issue.number, label_name, dur.days, assigned))
 
 
 
@@ -187,13 +187,13 @@ for column in columns:
             if column.name == 'Ready':
                 check_column_label(labels, 'ready', issue)
                 check_labels(labels, ['proposal'], issue, False)
-                check_if_stale(issue, 'rework', 7)
+                check_if_stale(issue, 'rework', 7, assigned)
             if column.name == 'In Progress':
                 check_column_label(labels, 'in progress', issue)
-                check_if_stale(issue, 'in progress', 7)
+                check_if_stale(issue, 'in progress', 7, assigned)
             if column.name == 'Review':
                 check_column_label(labels, 'review', issue)
-                check_if_stale(issue, 'review', 7)
+                check_if_stale(issue, 'review', 7, assigned)
             if column.name == 'Review Complete':
                 check_column_label(labels, 'completed', issue)
             if column.name == 'Done':
