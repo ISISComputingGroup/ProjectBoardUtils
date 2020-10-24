@@ -30,11 +30,17 @@ ZERO_POINT_LABELS = {'training', 'HLM', 'Cryomagnet', 'Friday',
 NO_POINT_LABELS = {'support', 'duplicate', 'sub-ticket'}
 
 NUM_ERROR = 0
+NUM_WARNING = 0
 
 def print_error(*args, **kwargs):
     global NUM_ERROR
     print(*args, **kwargs)
     NUM_ERROR += 1
+
+def print_warning(*args, **kwargs):
+    global NUM_WARNING
+    print(*args, **kwargs)
+    NUM_WARNING += 1
 
 # get names who are assigned to an issue
 # we use login rather than name attribute as name may not be set
@@ -76,7 +82,7 @@ def check_if_stale(issue, label_name, days_allowed, assigned):
     if created is not None:
         dur = datetime.datetime.now() - created
         if dur > datetime.timedelta(days_allowed):
-            print_error('ERROR: Issue {} has been in {} for {} days (assigned: {})'.format(issue.number, label_name, dur.days, assigned))
+            print_warning('WARNING: Issue {} has been in {} for {} days (assigned: {})'.format(issue.number, label_name, dur.days, assigned))
 
 
 
@@ -270,6 +276,9 @@ print("INFO: Total tickets in workflow columns = {}".format(tickets_sum))
 if NUM_ERROR > 0:
     print("\nINFO: There are {} errors\n".format(NUM_ERROR))
 
+if NUM_WARNING > 0:
+    print("\nINFO: There are {} warnings\n".format(NUM_WARNING))
+
 if not args.data:
     sys.exit(NUM_ERROR)
 
@@ -316,4 +325,4 @@ with open("tickets.csv", "w") as f:
             size = 0
         f.write("{},\"{}\",\"{}\",{},{}\n".format(issue.number, issue.title,get_assigned(issue), size, column))
 
-sys.exit(NUM_ERROR)
+sys.exit(0)
