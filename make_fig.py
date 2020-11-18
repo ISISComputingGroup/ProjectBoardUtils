@@ -15,13 +15,17 @@ try:
     with open('milestone.json') as f:
         ms_dict = json.load(f)
     target_sp = ms_dict['SP']
+    due_on = datetime.datetime.fromisoformat(ms_dict['DUE']).date()
 except:
     target_sp = 0
+    due_on = datetime.datetime.now().date()
 
 ## sprint length and number of days so far
 ## will cange to calculate using spriunt end date on milestone
 ntot = 28
 ncurr = len(df['Date'])
+first_day = datetime.date.fromisoformat(df['Date'][0])
+ntot = (due_on - first_day).days + 1
 
 ## completed burndown
 burndown = df['Review Complete'].values

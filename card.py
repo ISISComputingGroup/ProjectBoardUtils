@@ -240,6 +240,8 @@ except:
     ms_dict = {}
     ms_dict['SP'] = 0
 
+ms_dict['DUE'] = current_milestone.due_on.isoformat()
+
 with open('milestone.json', 'w') as f:
     json.dump(ms_dict, f)
 
