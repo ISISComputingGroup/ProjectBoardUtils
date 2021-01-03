@@ -235,12 +235,14 @@ for milestone in open_milestones:
 print("INFO: Current milestone is {} and has {} open and {} closed issues".format(current_milestone.title, current_milestone.open_issues, current_milestone.closed_issues))
 
 try:
-    ms_dict = json.loads(current_milestone.description)
+    ms_dict = json.loads(current_milestone.description.split('\n')[0])
 except:
     ms_dict = {}
     ms_dict['SP'] = 0
 
 ms_dict['DUE'] = current_milestone.due_on.isoformat()
+
+print("INFO: Current milestone target {SP} SP and is due on {DUE}".format(**ms_dict))
 
 with open('milestone.json', 'w') as f:
     json.dump(ms_dict, f)
