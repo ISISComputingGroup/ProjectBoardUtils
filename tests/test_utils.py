@@ -68,3 +68,13 @@ class GithubUtilsTests(unittest.TestCase):
     def test_GIVEN_PR_with_ticket_not_mentioned_WHEN_prs_checked_THEN_returns_false(self):
         pr_infos = [("Bad title", "Some body text", "some code changes")]
         self.assertFalse(ticket_mentioned_in_pr(1000, pr_infos))
+
+    def test_GIVEN_two_PRs_with_ticket_mentioned_in_first_WHEN_prs_checked_THEN_returns_true(self):
+        pr_infos = [("Ticket 1000", "Some body text", "some code changes"),
+                    ("Bad title", "Some body text", "some code changes")]
+        self.assertTrue(ticket_mentioned_in_pr(1000, pr_infos))
+
+    def test_GIVEN_two_PRs_with_ticket_mentioned_in_second_WHEN_prs_checked_THEN_returns_true(self):
+        pr_infos = [("Bad title", "Some body text", "some code changes"),
+                    ("Ticket 1000", "Some body text", "some code changes")]
+        self.assertTrue(ticket_mentioned_in_pr(1000, pr_infos))

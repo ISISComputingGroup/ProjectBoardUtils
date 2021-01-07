@@ -87,8 +87,9 @@ def get_all_info_for_PRs(repository, file_changed):
 
 def ticket_mentioned_in_pr(ticket_number, pr_infos):
     """Returns true if the specified ticket number is mentioned in any of the specified PRs"""
+    contains_ticket_number = []
     for pr_details in pr_infos:
-        contains_ticket_number = [str(ticket_number) in info for info in pr_details]
+        contains_ticket_number.extend([str(ticket_number) in info for info in pr_details])
     return any(contains_ticket_number)
 
 
