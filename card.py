@@ -8,8 +8,8 @@ import argparse
 from statistics import mode
 import datetime
 from datetime import date
-from github import Github, Issue
-from local_defs import GITHUB_TOKEN
+from github import Issue
+from utils import get_IBEX_repo, get_project_columns, COLUMNS
 
 parser = argparse.ArgumentParser(description='projects')
 parser.add_argument('--project', dest='project', default='IBEX Project Board')
@@ -21,10 +21,7 @@ args = parser.parse_args()
 # only be one such label on a ticket
 WORKFLOW_LABELS = ['bucket', 'ready', 'in progress', 'review',
                    'completed', 'awaiting', 'impeded']
-WORKFLOW_COLUMNS = ['Bucket', 'Ready', 'In Progress', 'Review',
-                    'Review Complete', 'Done', 'Impeded']
-POINTSUM_COLUMNS = ['Ready', 'In Progress', 'Review', 'Review Complete',
-                    'Impeded']
+POINTSUM_COLUMNS = [COLUMNS.READY, COLUMNS.IN_PROGRESS, COLUMNS.REVIEW, COLUMNS.COMPLETE, COLUMNS.IMPEDED]
 ZERO_POINT_LABELS = {'training', 'HLM', 'Cryomagnet', 'Friday',
                      'Datastreaming', 'standdown'}
 NO_POINT_LABELS = {'support', 'duplicate', 'sub-ticket'}
@@ -85,16 +82,8 @@ def check_if_stale(issue, label_name, days_allowed, assigned):
             print_warning('WARNING: Issue {} has been in {} for {} days (assigned: {})'.format(issue.number, label_name, dur.days, assigned))
 
 
-
-g = Github(GITHUB_TOKEN)
-repo = g.get_repo("ISISComputingGroup/IBEX")
-for p in repo.get_projects():
-    if p.name == args.project:
-        ibex_project = p
-
-print("## Checking project {} ##\n".format(ibex_project.name))
-
-columns = ibex_project.get_columns()
+repo = get_IBEX_repo()
+columns = get_project_columns(repo, args.project)
 
 issue_size = {}
 issue_column = {}
@@ -116,10 +105,10 @@ for column in columns:
     cards = column.get_cards()
     column_tickets[column.name] = cards.totalCount
     print("** Checking column \"{}\"".format(column.name))
-    if column.name not in WORKFLOW_COLUMNS:
+    if column.name not in COLUMNS.values():
         is_bucket = True
         print("INFO: unknown column \"{}\" - assuming like Bucket".format(column.name))
-    if column.name == 'Bucket':
+    if column.name == COLUMNS.BUCKET:
         is_bucket = True
     for card in cards:
         content = card.get_content()
@@ -185,34 +174,34 @@ for column in columns:
                 milestones.append(issue.milestone.title)
             if (issue.milestone is not None) and (issue.milestone.state == 'closed'):
                 print_error("ERROR: issue {} has a closed milestone (assigned: {})".format(issue.number, assigned))
-            if column.name not in WORKFLOW_COLUMNS:
+            if column.name not in COLUMNS.values():
                 check_labels(labels, ['rework'], issue, False)
-            if column.name == 'Bucket':
+            if column.name == COLUMNS.BUCKET:
                 check_column_label(labels, 'bucket', issue)
                 check_labels(labels, ['rework'], issue, False)
-            if column.name == 'Ready':
+            if column.name == COLUMNS.READY:
                 check_column_label(labels, 'ready', issue)
                 check_labels(labels, ['proposal'], issue, False)
                 check_if_stale(issue, 'rework', 7, assigned)
-            if column.name == 'In Progress':
+            if column.name == COLUMNS.IN_PROGRESS:
                 check_column_label(labels, 'in progress', issue)
                 check_if_stale(issue, 'in progress', 7, assigned)
-            if column.name == 'Review':
+            if column.name == COLUMNS.REVIEW:
                 check_column_label(labels, 'review', issue)
                 check_if_stale(issue, 'review', 7, assigned)
-            if column.name == 'Review Complete':
+            if column.name == COLUMNS.COMPLETE:
                 check_column_label(labels, 'completed', issue)
-            if column.name == 'Done':
+            if column.name == COLUMNS.DONE:
                 check_column_label(labels, 'completed', issue)
-            if column.name == 'Impeded':
+            if column.name == COLUMNS.IMPEDED:
                 check_column_label(labels, 'impeded', issue)
-            if in_rework and column.name in ['Ready', 'In Progress', 'Impeded']:
+            if in_rework and column.name in [COLUMNS.READY, COLUMNS.IN_PROGRESS, COLUMNS.IMPEDED]:
                 current_rework += 1
-            if in_rework and column.name in ['Review', 'Review Complete', 'Done']:
+            if in_rework and column.name in [COLUMNS.REVIEW, COLUMNS.COMPLETE, COLUMNS.DONE]:
                 completed_rework += 1
 #            if addigned != 'None' and column.name in [ 'Bucket' ]:
 #                print_error("ERROR: issue {} cannot be assigned to {}".format(issue.number,assigned))
-            if assigned == 'None' and column.name in ['In Progress', 'Review', 'Review Complete']:
+            if assigned == 'None' and column.name in [COLUMNS.IN_PROGRESS, COLUMNS.REVIEW, COLUMNS.COMPLETE]:
                 print_error("ERROR: issue {} must be assigned to somebody".format(issue.number))
         else:
             pr = card.get_content()
