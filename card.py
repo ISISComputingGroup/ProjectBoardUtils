@@ -24,7 +24,7 @@ WORKFLOW_LABELS = ['bucket', 'ready', 'in progress', 'review',
 POINTSUM_COLUMNS = [COLUMNS.READY, COLUMNS.IN_PROGRESS, COLUMNS.REVIEW, COLUMNS.COMPLETE, COLUMNS.IMPEDED]
 ZERO_POINT_LABELS = {'training', 'HLM', 'Cryomagnet', 'Friday',
                      'Datastreaming', 'standdown'}
-NO_POINT_LABELS = {'support', 'duplicate', 'sub-ticket'}
+NO_POINT_LABELS = {'support', 'duplicate', 'sub-ticket', 'wontfix'}
 
 NUM_ERROR = 0
 NUM_WARNING = 0
