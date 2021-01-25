@@ -3,6 +3,8 @@ export PYTHONPATH=/home/faa59/card
 
 cd /home/faa59/card
 
+. ./venv/bin/activate
+
 ts=`date +%Y-%m-%d`
 month=`date +%m`
 year=`date +%Y`
