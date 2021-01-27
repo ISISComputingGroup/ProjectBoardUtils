@@ -99,19 +99,19 @@ tickets_added_during_sprint = 0
 points_added_during_sprint = 0
 # all columns except Bucket should have sizes on tickets
 # and this size should not be 0
-for column in columns:
-    print("** Checking column \"{}\"".format(column.name))
-    column_name = COLUMNS.from_value(column.name)
+for github_column in columns:
+    print("** Checking column \"{}\"".format(github_column.name))
+    column = COLUMNS.from_value(github_column.name)
 
     total = 0
-    cards = column.get_cards()
-    column_tickets[column_name] = cards.totalCount
+    cards = github_column.get_cards()
+    column_tickets[column] = cards.totalCount
 
     is_bucket = False
-    if column_name is COLUMNS.UNKNOWN:
+    if column is COLUMNS.UNKNOWN:
         is_bucket = True
-        print("INFO: unknown column \"{}\" - assuming like Bucket".format(column.name))
-    if column_name is COLUMNS.BUCKET:
+        print("INFO: unknown column \"{}\" - assuming like Bucket".format(github_column.name))
+    if column is COLUMNS.BUCKET:
         is_bucket = True
 
     for card in cards:
@@ -153,7 +153,7 @@ for column in columns:
                 elif is_bucket:
                     pass
                 else:
-                    print_error("ERROR: no size for issue {} in {} (assigned: {})".format(issue.number, column.name, assigned))
+                    print_error("ERROR: no size for issue {} in {} (assigned: {})".format(issue.number, column, assigned))
             elif size == 0:
                 zero_labels = ZERO_POINT_LABELS.intersection(labels)
                 if len(zero_labels) > 0:
@@ -169,7 +169,7 @@ for column in columns:
                 total += size
             if size is not None:
                 issue_size[issue.number] = size
-            issue_column[issue.number] = column_name
+            issue_column[issue.number] = column
             if is_bucket and issue.milestone is not None:
                 print_error("ERROR: issue {} has milestone {} (assigned: {})".format(issue.number, issue.milestone.title, get_assigned(issue)))
             if not is_bucket and issue.milestone is None:
@@ -178,40 +178,40 @@ for column in columns:
                 milestones.append(issue.milestone.title)
             if (issue.milestone is not None) and (issue.milestone.state == 'closed'):
                 print_error("ERROR: issue {} has a closed milestone (assigned: {})".format(issue.number, assigned))
-            if column_name is COLUMNS.UNKNOWN:
+            if column is COLUMNS.UNKNOWN:
                 check_labels(labels, ['rework'], issue, False)
-            if column_name is COLUMNS.BUCKET:
+            if column is COLUMNS.BUCKET:
                 check_column_label(labels, 'bucket', issue)
                 check_labels(labels, ['rework'], issue, False)
-            if column_name is COLUMNS.READY:
+            if column is COLUMNS.READY:
                 check_column_label(labels, 'ready', issue)
                 check_labels(labels, ['proposal'], issue, False)
                 check_if_stale(issue, 'rework', 7, assigned)
-            if column_name is COLUMNS.IN_PROGRESS:
+            if column is COLUMNS.IN_PROGRESS:
                 check_column_label(labels, 'in progress', issue)
                 check_if_stale(issue, 'in progress', 7, assigned)
-            if column_name is COLUMNS.REVIEW:
+            if column is COLUMNS.REVIEW:
                 check_column_label(labels, 'review', issue)
                 check_if_stale(issue, 'review', 7, assigned)
-            if column_name is COLUMNS.COMPLETE:
+            if column is COLUMNS.COMPLETE:
                 check_column_label(labels, 'completed', issue)
-            if column_name is COLUMNS.DONE:
+            if column is COLUMNS.DONE:
                 check_column_label(labels, 'completed', issue)
-            if column_name is COLUMNS.IMPEDED:
+            if column is COLUMNS.IMPEDED:
                 check_column_label(labels, 'impeded', issue)
-            if in_rework and column_name in [COLUMNS.READY, COLUMNS.IN_PROGRESS, COLUMNS.IMPEDED]:
+            if in_rework and column in [COLUMNS.READY, COLUMNS.IN_PROGRESS, COLUMNS.IMPEDED]:
                 current_rework += 1
-            if in_rework and column_name in [COLUMNS.REVIEW, COLUMNS.COMPLETE, COLUMNS.DONE]:
+            if in_rework and column in [COLUMNS.REVIEW, COLUMNS.COMPLETE, COLUMNS.DONE]:
                 completed_rework += 1
 #            if addigned != 'None' and column.name in [ 'Bucket' ]:
 #                print_error("ERROR: issue {} cannot be assigned to {}".format(issue.number,assigned))
-            if assigned == 'None' and column_name in [COLUMNS.IN_PROGRESS, COLUMNS.REVIEW, COLUMNS.COMPLETE]:
+            if assigned == 'None' and column in [COLUMNS.IN_PROGRESS, COLUMNS.REVIEW, COLUMNS.COMPLETE]:
                 print_error("ERROR: issue {} must be assigned to somebody".format(issue.number))
         else:
             pr = card.get_content()
             print_error("ERROR: pullrequest {} not allowed".format(pr.number))
-    print("INFO: column \"{}\" contains {} cards and {} points\n".format(column_name.value, cards.totalCount, total))
-    column_points[column_name] = total
+    print("INFO: column \"{}\" contains {} cards and {} points\n".format(column, cards.totalCount, total))
+    column_points[column] = total
 
 print("INFO: number of issues under review = {}".format(tickets_under_review))
 print("INFO: number of points under review = {}".format(points_under_review))
@@ -257,7 +257,7 @@ print("")
 
 points_sum = 0
 for x in sorted(column_points.keys()):
-    print("INFO: Points in column {} = {}".format(x.value, column_points[x]))
+    print("INFO: Points in column {} = {}".format(x, column_points[x]))
     if x in POINTSUM_COLUMNS:
         points_sum += column_points[x]
 
@@ -266,7 +266,7 @@ for x in sorted(column_tickets.keys()):
     if x in POINTSUM_COLUMNS:
         tickets_sum += column_tickets[x]
 
-print("\nINFO: Workflow columns are: {}".format(','.join(str(x.value) for x in POINTSUM_COLUMNS)))
+print("\nINFO: Workflow columns are: {}".format(','.join(str(x) for x in POINTSUM_COLUMNS)))
 print("INFO: Total points in workflow columns = {}".format(points_sum))
 print("INFO: Total tickets in workflow columns = {}".format(tickets_sum))
 
@@ -320,6 +320,6 @@ with open("tickets.csv", "w") as f:
             size = issue_size[issue.number]
         else:
             size = 0
-        f.write("{},\"{}\",\"{}\",{},{}\n".format(issue.number, issue.title,get_assigned(issue), size, column))
+        f.write("{},\"{}\",\"{}\",{},{}\n".format(issue.number, issue.title, get_assigned(issue), size, column))
 
 sys.exit(0)

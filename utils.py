@@ -31,6 +31,9 @@ class COLUMNS(Enum):
     def __lt__(self, other):
         return self.value < other.value
 
+    def __str__(self):
+        return self.value
+
 
 def get_IBEX_repo():
     github = Github(GITHUB_TOKEN)
