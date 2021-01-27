@@ -15,6 +15,7 @@ class COLUMNS(Enum):
     COMPLETE = "Review Complete"
     DONE = "Done"
     IMPEDED = "Impeded"
+    UNKNOWN = "Unknown"
 
     @staticmethod
     def values():
@@ -25,7 +26,10 @@ class COLUMNS(Enum):
         enums = [c for c in COLUMNS if c.value == value]
         if value:
             return enums[0]
-        raise KeyError(f"{value} not found in COLUMNS")
+        return COLUMNS.UNKNOWN
+
+    def __lt__(self, other):
+        return self.value < other.value
 
 
 def get_IBEX_repo():
