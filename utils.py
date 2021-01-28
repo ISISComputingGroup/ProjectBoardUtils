@@ -15,6 +15,7 @@ class COLUMNS(Enum):
     COMPLETE = "Review Complete"
     DONE = "Done"
     IMPEDED = "Impeded"
+    UNKNOWN = "Unknown"
 
     @staticmethod
     def values():
@@ -23,9 +24,16 @@ class COLUMNS(Enum):
     @staticmethod
     def from_value(value):
         enums = [c for c in COLUMNS if c.value == value]
-        if value:
+        try:
             return enums[0]
-        raise KeyError(f"{value} not found in COLUMNS")
+        except IndexError:
+            return COLUMNS.UNKNOWN
+
+    def __lt__(self, other):
+        return self.value < other.value
+
+    def __str__(self):
+        return self.value
 
 
 def get_IBEX_repo():
@@ -78,7 +86,7 @@ def get_all_info_for_PRs(repository, file_changed):
     prs = []
     for pr in release_notes_prs:
         title, content, files_changed = pr.title, pr.body, pr.get_files()
-        changes_made = [file.patch for file in files_changed if file.filename == file_changed]
+        changes_made = [file.patch for file in files_changed if os.path.basename(file.filename) == file_changed]
         changes_made = "" if not changes_made else changes_made[0]
         prs.append((title, content, changes_made))
 

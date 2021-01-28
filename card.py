@@ -79,7 +79,7 @@ def check_if_stale(issue, label_name, days_allowed, assigned):
     if created is not None:
         dur = datetime.datetime.now() - created
         if dur > datetime.timedelta(days_allowed):
-            print_warning('WARNING: Issue {} has been in {} for {} days (assigned: {})'.format(issue.number, label_name, dur.days, assigned))
+            print_warning('WARNING: Issue {} has been in "{}" for {} days (assigned: {})'.format(issue.number, label_name, dur.days, assigned))
 
 
 repo = get_IBEX_repo()
@@ -99,17 +99,21 @@ tickets_added_during_sprint = 0
 points_added_during_sprint = 0
 # all columns except Bucket should have sizes on tickets
 # and this size should not be 0
-for column in columns:
+for github_column in columns:
+    print("** Checking column \"{}\"".format(github_column.name))
+    column = COLUMNS.from_value(github_column.name)
+
     total = 0
+    cards = github_column.get_cards()
+    column_tickets[column] = cards.totalCount
+
     is_bucket = False
-    cards = column.get_cards()
-    column_tickets[column.name] = cards.totalCount
-    print("** Checking column \"{}\"".format(column.name))
-    if column.name not in COLUMNS.values():
+    if column is COLUMNS.UNKNOWN:
         is_bucket = True
-        print("INFO: unknown column \"{}\" - assuming like Bucket".format(column.name))
-    if column.name == COLUMNS.BUCKET:
+        print("INFO: unknown column \"{}\" - assuming like Bucket".format(github_column.name))
+    if column is COLUMNS.BUCKET:
         is_bucket = True
+
     for card in cards:
         content = card.get_content()
         if isinstance(content, Issue.Issue):
@@ -149,7 +153,7 @@ for column in columns:
                 elif is_bucket:
                     pass
                 else:
-                    print_error("ERROR: no size for issue {} in {} (assigned: {})".format(issue.number, column.name, assigned))
+                    print_error("ERROR: no size for issue {} in {} (assigned: {})".format(issue.number, column, assigned))
             elif size == 0:
                 zero_labels = ZERO_POINT_LABELS.intersection(labels)
                 if len(zero_labels) > 0:
@@ -165,7 +169,7 @@ for column in columns:
                 total += size
             if size is not None:
                 issue_size[issue.number] = size
-            issue_column[issue.number] = column.name
+            issue_column[issue.number] = column
             if is_bucket and issue.milestone is not None:
                 print_error("ERROR: issue {} has milestone {} (assigned: {})".format(issue.number, issue.milestone.title, get_assigned(issue)))
             if not is_bucket and issue.milestone is None:
@@ -174,40 +178,40 @@ for column in columns:
                 milestones.append(issue.milestone.title)
             if (issue.milestone is not None) and (issue.milestone.state == 'closed'):
                 print_error("ERROR: issue {} has a closed milestone (assigned: {})".format(issue.number, assigned))
-            if column.name not in COLUMNS.values():
+            if column is COLUMNS.UNKNOWN:
                 check_labels(labels, ['rework'], issue, False)
-            if column.name == COLUMNS.BUCKET:
+            if column is COLUMNS.BUCKET:
                 check_column_label(labels, 'bucket', issue)
                 check_labels(labels, ['rework'], issue, False)
-            if column.name == COLUMNS.READY:
+            if column is COLUMNS.READY:
                 check_column_label(labels, 'ready', issue)
                 check_labels(labels, ['proposal'], issue, False)
                 check_if_stale(issue, 'rework', 7, assigned)
-            if column.name == COLUMNS.IN_PROGRESS:
+            if column is COLUMNS.IN_PROGRESS:
                 check_column_label(labels, 'in progress', issue)
                 check_if_stale(issue, 'in progress', 7, assigned)
-            if column.name == COLUMNS.REVIEW:
+            if column is COLUMNS.REVIEW:
                 check_column_label(labels, 'review', issue)
                 check_if_stale(issue, 'review', 7, assigned)
-            if column.name == COLUMNS.COMPLETE:
+            if column is COLUMNS.COMPLETE:
                 check_column_label(labels, 'completed', issue)
-            if column.name == COLUMNS.DONE:
+            if column is COLUMNS.DONE:
                 check_column_label(labels, 'completed', issue)
-            if column.name == COLUMNS.IMPEDED:
+            if column is COLUMNS.IMPEDED:
                 check_column_label(labels, 'impeded', issue)
-            if in_rework and column.name in [COLUMNS.READY, COLUMNS.IN_PROGRESS, COLUMNS.IMPEDED]:
+            if in_rework and column in [COLUMNS.READY, COLUMNS.IN_PROGRESS, COLUMNS.IMPEDED]:
                 current_rework += 1
-            if in_rework and column.name in [COLUMNS.REVIEW, COLUMNS.COMPLETE, COLUMNS.DONE]:
+            if in_rework and column in [COLUMNS.REVIEW, COLUMNS.COMPLETE, COLUMNS.DONE]:
                 completed_rework += 1
 #            if addigned != 'None' and column.name in [ 'Bucket' ]:
 #                print_error("ERROR: issue {} cannot be assigned to {}".format(issue.number,assigned))
-            if assigned == 'None' and column.name in [COLUMNS.IN_PROGRESS, COLUMNS.REVIEW, COLUMNS.COMPLETE]:
+            if assigned == 'None' and column in [COLUMNS.IN_PROGRESS, COLUMNS.REVIEW, COLUMNS.COMPLETE]:
                 print_error("ERROR: issue {} must be assigned to somebody".format(issue.number))
         else:
             pr = card.get_content()
             print_error("ERROR: pullrequest {} not allowed".format(pr.number))
-    print("INFO: column \"{}\" contains {} cards and {} points\n".format(column.name, cards.totalCount, total))
-    column_points[column.name] = total
+    print("INFO: column \"{}\" contains {} cards and {} points\n".format(column, cards.totalCount, total))
+    column_points[column] = total
 
 print("INFO: number of issues under review = {}".format(tickets_under_review))
 print("INFO: number of points under review = {}".format(points_under_review))
@@ -281,29 +285,29 @@ with open("issue-size-{}.json".format(ts), "w") as f:
     f.write(json.dumps(issue_size))
 
 with open("issue-column-{}.json".format(ts), "w") as f:
-    f.write(json.dumps(issue_column))
+    f.write(json.dumps({number: column.value for number, column in issue_column.items()}))
 
 if not os.path.exists("burndown-points.csv"):
     with open("burndown-points.csv", "w") as f:
-        f.write("Date,{},Points Sum,Points Added,Burndown\n".format(",".join([x for x in sorted(column_points.keys())])))
+        f.write("Date,{},Points Sum,Points Added,Burndown\n".format(",".join([x.value for x in sorted(column_points.keys()) if x is not COLUMNS.UNKNOWN])))
 
 if not os.path.exists("burndown-tickets.csv"):
     with open("burndown-tickets.csv", "w") as f:
-        f.write("Date,{},Under Review,Current Rework,Completed Rework,Tickets Sum,Tickets Added,Burndown\n".format(",".join([x for x in sorted(column_tickets.keys())])))
+        f.write("Date,{},Under Review,Current Rework,Completed Rework,Tickets Sum,Tickets Added,Burndown\n".format(",".join([x.value for x in sorted(column_tickets.keys()) if x is not COLUMNS.UNKNOWN])))
 
 with open("burndown-points.csv", "a") as f:
     if 'Review Complete' in column_points:
         completed = column_points['Review Complete']
     else:
         completed = 0
-    f.write("{},{},{},{},{}\n".format(ts, ",".join([str(column_points[x]) for x in sorted(column_points.keys())]), points_sum, points_added_during_sprint, points_sum - points_added_during_sprint-completed))
+    f.write("{},{},{},{},{}\n".format(ts, ",".join([str(column_points[x]) for x in sorted(column_points.keys()) if x is not COLUMNS.UNKNOWN]), points_sum, points_added_during_sprint, points_sum - points_added_during_sprint-completed))
 
 with open("burndown-tickets.csv", "a") as f:
     if 'Review Complete' in column_tickets:
         completed = column_tickets['Review Complete']
     else:
         completed = 0
-    f.write("{},{},{},{},{},{},{},{}\n".format(ts, ",".join([str(column_tickets[x]) for x in sorted(column_tickets.keys())]),tickets_under_review,current_rework, completed_rework, tickets_sum, tickets_added_during_sprint, tickets_sum - tickets_added_during_sprint - completed))
+    f.write("{},{},{},{},{},{},{},{}\n".format(ts, ",".join([str(column_tickets[x]) for x in sorted(column_tickets.keys()) if x is not COLUMNS.UNKNOWN]),tickets_under_review,current_rework, completed_rework, tickets_sum, tickets_added_during_sprint, tickets_sum - tickets_added_during_sprint - completed))
 
 with open("tickets.csv", "w") as f:
     f.write("Number,Title,Assigned,Points,Column\n")
@@ -316,6 +320,6 @@ with open("tickets.csv", "w") as f:
             size = issue_size[issue.number]
         else:
             size = 0
-        f.write("{},\"{}\",\"{}\",{},{}\n".format(issue.number, issue.title,get_assigned(issue), size, column))
+        f.write("{},\"{}\",\"{}\",{},{}\n".format(issue.number, issue.title, get_assigned(issue), size, column))
 
 sys.exit(0)
