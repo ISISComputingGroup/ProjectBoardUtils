@@ -24,9 +24,10 @@ class COLUMNS(Enum):
     @staticmethod
     def from_value(value):
         enums = [c for c in COLUMNS if c.value == value]
-        if value:
+        try:
             return enums[0]
-        return COLUMNS.UNKNOWN
+        except IndexError:
+            return COLUMNS.UNKNOWN
 
     def __lt__(self, other):
         return self.value < other.value
