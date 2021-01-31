@@ -6,16 +6,21 @@ RELEASE_NOTES_FOLDER = "release_notes"
 
 UPCOMING_CHANGES_FILE = "ReleaseNotes_Upcoming.md"
 
+LABELS_TO_IGNORE = ["support"]
+
 
 def check_review_in_prs(repository, column_dict):
     in_error = False
     prs = get_all_info_for_PRs(repository, UPCOMING_CHANGES_FILE)
 
     for ticket in get_issues_from_cards(column_dict[COLUMNS.REVIEW]):
+        ticket_labels = set([label.name for label in ticket.labels])
+        if ticket_labels.intersection(LABELS_TO_IGNORE):
+            continue
         ticket_number = ticket.number
         if not ticket_mentioned_in_pr(ticket_number, prs):
             in_error = True
-            print(f"ERROR: issue {ticket_number} no PR modifying release notes found")
+            print(f"ERROR: issue {ticket_number} has no PR modifying release notes ({ticket.html_url})")
     return in_error
 
 
