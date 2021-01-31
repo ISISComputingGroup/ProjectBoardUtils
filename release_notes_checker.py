@@ -20,7 +20,7 @@ def check_review_in_prs(repository, column_dict):
         ticket_number = ticket.number
         if not ticket_mentioned_in_pr(ticket_number, prs):
             in_error = True
-            print(f"ERROR: no PR modifying release notes found for {ticket.html_url}")
+            print(f"ERROR: issue {ticket_number} has no PR modifying release notes ({ticket.html_url})")
     return in_error
 
 
