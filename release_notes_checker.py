@@ -34,6 +34,9 @@ def check_complete_in_a_file(column_dict):
     all_release_notes_text = get_text_with_extension(os.path.join(RELEASE_NOTES_REPO_PATH, RELEASE_NOTES_FOLDER), "md")
 
     for ticket in done_tickets:
+        ticket_labels = set([label.name for label in ticket.labels])
+        if ticket_labels.intersection(LABELS_TO_IGNORE):
+            continue
         if ticket.html_url not in all_release_notes_text:
             in_error = True
             print(f"ERROR: issue {ticket.number} merged but not in release notes, no link found to {ticket.html_url}")
