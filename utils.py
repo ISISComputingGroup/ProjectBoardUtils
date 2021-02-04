@@ -94,11 +94,14 @@ def get_all_info_for_PRs(repository, file_changed):
 
 
 def ticket_mentioned_in_pr(ticket_number, pr_infos):
-    """Returns true if the specified ticket number is mentioned in any of the specified PRs"""
-    contains_ticket_number = []
+    """Returns a tuple of whether the ticket number is in a title
+    and whether the ticket number is mentioned in any of the specified PRs"""
+    contains_ticket_number_anywhere = []
+    contains_ticket_number_in_title = []
     for pr_details in pr_infos:
-        contains_ticket_number.extend([str(ticket_number) in info for info in pr_details])
-    return any(contains_ticket_number)
+        contains_ticket_number_in_title.append(str(ticket_number) in pr_details[0])
+        contains_ticket_number_anywhere.extend([str(ticket_number) in info for info in pr_details[1:]])
+    return any(contains_ticket_number_in_title), any(contains_ticket_number_anywhere)
 
 
 def get_issues_from_cards(cards):

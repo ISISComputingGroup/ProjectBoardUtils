@@ -18,6 +18,9 @@ def check_review_in_prs(repository, column_dict):
         if ticket_labels.intersection(LABELS_TO_IGNORE):
             continue
         ticket_number = ticket.number
+        ticket_in_title, ticket_anywhere = ticket_mentioned_in_pr(ticket_number, prs)
+        if not ticket_in_title:
+            print(f"WARNING: issue {ticket_number} is not mentioned in the title of any PRs modifying release notes")
         if not ticket_mentioned_in_pr(ticket_number, prs):
             in_error = True
             print(f"ERROR: issue {ticket_number} has no PR modifying release notes ({ticket.html_url})")
