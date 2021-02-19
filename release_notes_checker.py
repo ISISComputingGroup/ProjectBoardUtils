@@ -21,7 +21,7 @@ def check_review_in_prs(repository, column_dict):
         ticket_in_title, ticket_anywhere = ticket_mentioned_in_pr(ticket_number, prs)
         if not ticket_in_title:
             in_error = True
-            print(f"ERROR: issue {ticket_number} is not mentioned in the title of any PRs modifying release notes (assigned: {get_assigned(ticket)})")
+            print(f"ERROR: issue {ticket_number} is not mentioned in the title of any open PRs modifying release notes (assigned: {get_assigned(ticket)})")
         if not ticket_mentioned_in_pr(ticket_number, prs):
             in_error = True
             print(f"ERROR: issue {ticket_number} has no PR modifying release notes ({ticket.html_url}, assigned: {get_assigned(ticket)})")
