@@ -20,10 +20,11 @@ def check_review_in_prs(repository, column_dict):
         ticket_number = ticket.number
         ticket_in_title, ticket_anywhere = ticket_mentioned_in_pr(ticket_number, prs)
         if not ticket_in_title:
-            print(f"WARNING: issue {ticket_number} is not mentioned in the title of any PRs modifying release notes")
+            in_error = True
+            print(f"ERROR: issue {ticket_number} is not mentioned in the title of any PRs modifying release notes (assigned: {get_assigned(ticket)})")
         if not ticket_mentioned_in_pr(ticket_number, prs):
             in_error = True
-            print(f"ERROR: issue {ticket_number} has no PR modifying release notes ({ticket.html_url})")
+            print(f"ERROR: issue {ticket_number} has no PR modifying release notes ({ticket.html_url}, assigned: {get_assigned(ticket)})")
     return in_error
 
 
@@ -42,7 +43,7 @@ def check_complete_in_a_file(column_dict):
             continue
         if ticket.html_url not in all_release_notes_text:
             in_error = True
-            print(f"ERROR: issue {ticket.number} merged but not in release notes, no link found to {ticket.html_url}")
+            print(f"ERROR: issue {ticket.number} merged but not linked in release notes (assigned: {get_assigned(ticket)})")
     return in_error
 
 

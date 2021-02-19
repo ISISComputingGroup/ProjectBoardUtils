@@ -137,3 +137,16 @@ def get_text_with_extension(folder_path, file_extension):
         with open(file_name, "r") as file:
             contents += file.read()
     return contents
+
+# get names who are assigned to an issue
+# we use login rather than name attribute as name may not be set
+def get_assigned(issue):
+    assigned = [x.login for x in issue.assignees]
+    if issue.assignee is not None:
+        assigned.append(issue.assignee.login)
+    assigned = [x if x is not None else 'None' for x in assigned]
+    assigned = set(assigned)
+    if len(assigned) > 0:
+        return ','.join(assigned)
+    else:
+        return 'None'

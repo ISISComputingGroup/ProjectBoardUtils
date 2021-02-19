@@ -9,7 +9,7 @@ from statistics import mode
 import datetime
 from datetime import date
 from github import Issue
-from utils import get_IBEX_repo, get_project_columns, COLUMNS
+from utils import get_IBEX_repo, get_project_columns, COLUMNS, get_assigned
 
 parser = argparse.ArgumentParser(description='projects')
 parser.add_argument('--project', dest='project', default='IBEX Project Board')
@@ -39,18 +39,6 @@ def print_warning(*args, **kwargs):
     print(*args, **kwargs)
     NUM_WARNING += 1
 
-# get names who are assigned to an issue
-# we use login rather than name attribute as name may not be set
-def get_assigned(issue):
-    assigned = [x.login for x in issue.assignees]
-    if issue.assignee is not None:
-        assigned.append(issue.assignee.login)
-    assigned = [x if x is not None else 'None' for x in assigned]
-    assigned = set(assigned)
-    if len(assigned) > 0:
-        return ','.join(assigned)
-    else:
-        return 'None'
 
 def check_labels(labels, check, issue, present):
     assigned = get_assigned(issue)
