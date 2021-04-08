@@ -170,7 +170,6 @@ for github_column in columns:
                 check_labels(labels, ['rework'], issue, False)
             if column is COLUMNS.BUCKET:
                 check_column_label(labels, 'bucket', issue)
-                check_labels(labels, ['rework'], issue, False)
             if column is COLUMNS.READY:
                 check_column_label(labels, 'ready', issue)
                 check_labels(labels, ['proposal'], issue, False)
