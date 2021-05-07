@@ -52,10 +52,12 @@ def check_labels(labels, check, issue, present):
         if len(diff) > 0:
             print_error('ERROR: issue {} has the following INVALID labels: {} (assigned: {})'.format(issue.number, ','.join(diff), assigned))
 
+
 def check_column_label(labels, label, issue):
     check_labels(labels, [label], issue, True)
     no_labels = [x for x in WORKFLOW_LABELS if x != label]
     check_labels(labels, no_labels, issue, False)
+
 
 def check_if_stale(issue, label_name, days_allowed, assigned):
     created = None
@@ -88,8 +90,12 @@ points_added_during_sprint = 0
 # all columns except Bucket should have sizes on tickets
 # and this size should not be 0
 for github_column in columns:
-    print("** Checking column \"{}\"".format(github_column.name))
+    print(f'** Checking column "{github_column.name}"')
     column = COLUMNS.from_value(github_column.name)
+
+    if column is COLUMNS.IGNORED:
+        print(f"Ignoring column {github_column.name}")
+        continue
 
     total = 0
     cards = github_column.get_cards()
