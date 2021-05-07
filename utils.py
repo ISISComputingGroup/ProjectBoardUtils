@@ -16,6 +16,7 @@ class COLUMNS(Enum):
     DONE = "Done"
     IMPEDED = "Impeded"
     UNKNOWN = "Unknown"
+    IGNORED = "Ignored"
 
     @staticmethod
     def values():
@@ -27,6 +28,8 @@ class COLUMNS(Enum):
         try:
             return enums[0]
         except IndexError:
+            if value.startswith("Sprint"):
+                return COLUMNS.IGNORED
             return COLUMNS.UNKNOWN
 
     def __lt__(self, other):
