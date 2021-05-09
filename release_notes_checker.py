@@ -33,7 +33,6 @@ def check_complete_in_a_file(column_dict):
     pull_or_clone_repository(RELEASE_NOTES_REPO_PATH, "https://github.com/ISISComputingGroup/IBEX.git")
 
     done_tickets = get_issues_from_cards(column_dict[COLUMNS.COMPLETE])
-    done_tickets.extend(get_issues_from_cards(column_dict[COLUMNS.DONE]))
 
     all_release_notes_text = get_text_with_extension(os.path.join(RELEASE_NOTES_REPO_PATH, RELEASE_NOTES_FOLDER), "md")
 
