@@ -289,15 +289,15 @@ if not os.path.exists("burndown-tickets.csv"):
         f.write("Date,{},Under Review,Current Rework,Completed Rework,Tickets Sum,Tickets Added,Burndown\n".format(",".join([x.value for x in sorted(column_tickets.keys()) if x is not COLUMNS.UNKNOWN])))
 
 with open("burndown-points.csv", "a") as f:
-    if 'Review Complete' in column_points:
-        completed = column_points['Review Complete']
+    if COLUMNS.COMPLETE in column_points:
+        completed = column_points[COLUMNS.COMPLETE]
     else:
         completed = 0
     f.write("{},{},{},{},{}\n".format(ts, ",".join([str(column_points[x]) for x in sorted(column_points.keys()) if x is not COLUMNS.UNKNOWN]), points_sum, points_added_during_sprint, points_sum - points_added_during_sprint-completed))
 
 with open("burndown-tickets.csv", "a") as f:
-    if 'Review Complete' in column_tickets:
-        completed = column_tickets['Review Complete']
+    if COLUMNS.COMPLETE in column_tickets:
+        completed = column_tickets[COLUMNS.COMPLETE]
     else:
         completed = 0
     f.write("{},{},{},{},{},{},{},{}\n".format(ts, ",".join([str(column_tickets[x]) for x in sorted(column_tickets.keys()) if x is not COLUMNS.UNKNOWN]),tickets_under_review,current_rework, completed_rework, tickets_sum, tickets_added_during_sprint, tickets_sum - tickets_added_during_sprint - completed))
