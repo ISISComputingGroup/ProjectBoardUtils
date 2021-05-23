@@ -11,6 +11,8 @@ LABELS_TO_IGNORE = ["support", "HLM"]
 
 def check_review_in_prs(repository, column_dict):
     in_error = False
+    pull_or_clone_repository(RELEASE_NOTES_REPO_PATH, "https://github.com/ISISComputingGroup/IBEX.git")
+    all_release_notes_text = get_text_with_extension(os.path.join(RELEASE_NOTES_REPO_PATH, RELEASE_NOTES_FOLDER), "md")
     prs = get_all_info_for_PRs(repository, UPCOMING_CHANGES_FILE)
 
     for ticket in get_issues_from_cards(column_dict[COLUMNS.REVIEW]):
@@ -21,7 +23,10 @@ def check_review_in_prs(repository, column_dict):
         ticket_in_title, ticket_anywhere = ticket_mentioned_in_pr(ticket_number, prs)
         if not ticket_in_title:
             in_error = True
-            print(f"ERROR: issue {ticket_number} is not mentioned in the title of any open PRs modifying release notes (assigned: {get_assigned(ticket)})")
+            if ticket.html_url in all_release_notes_text:
+                print(f"ERROR: issue {ticket_number} has merged release notes but is still in review (assigned: {get_assigned(ticket)})")
+            else:
+                print(f"ERROR: issue {ticket_number} is not mentioned in the title of any open PRs modifying release notes (assigned: {get_assigned(ticket)})")
         if not ticket_mentioned_in_pr(ticket_number, prs):
             in_error = True
             print(f"ERROR: issue {ticket_number} has no PR modifying release notes ({ticket.html_url}, assigned: {get_assigned(ticket)})")
