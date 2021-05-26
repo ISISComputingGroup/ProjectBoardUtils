@@ -6,7 +6,7 @@ RELEASE_NOTES_FOLDER = "release_notes"
 
 UPCOMING_CHANGES_FILE = "ReleaseNotes_Upcoming.md"
 
-LABELS_TO_IGNORE = ["support", "HLM"]
+LABELS_TO_IGNORE = ["no_release_notes", "HLM"]
 
 
 def check_review_in_prs(repository, column_dict):
