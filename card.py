@@ -186,10 +186,10 @@ for github_column in columns:
             if column is COLUMNS.REVIEW:
                 check_column_label(labels, 'review', issue)
                 check_if_stale(issue, 'review', 7, assigned)
-            if column is COLUMNS.COMPLETE:
-                check_column_label(labels, 'completed', issue)
-            if column is COLUMNS.DONE:
-                check_column_label(labels, 'completed', issue)
+            # if column is COLUMNS.COMPLETE:
+            #    check_column_label(labels, 'completed', issue)
+            # if column is COLUMNS.DONE:
+            #     check_column_label(labels, 'completed', issue)
             if column is COLUMNS.IMPEDED:
                 check_column_label(labels, 'impeded', issue)
             if in_rework and column in [COLUMNS.READY, COLUMNS.IN_PROGRESS, COLUMNS.IMPEDED]:
