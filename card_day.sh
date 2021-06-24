@@ -23,8 +23,7 @@ python3 /home/faa59/card/release_notes_checker.py > release_notes_check.txt
 python3 /home/faa59/card/make_fig.py
 
 ## update web files
-cp -f release_notes_check.txt summary.txt tickets.csv burndown-tickets.csv burndown-points.csv /isis/www/ibex
-cp -f burndown-points.html /isis/www/ibex
-cp release_notes_check.txt summary.txt tickets.csv burndown-tickets.csv burndown-points.csv ${daily_dir}
+cp -f release_notes_check.txt summary.txt tickets.csv burndown-tickets.csv burndown-points.csv burndown-points.html /isis/www/ibex
+cp release_notes_check.txt summary.txt tickets.csv burndown-tickets.csv burndown-points.csv burndown-points.html ${daily_dir}
 mv issue-column-${ts}.json ${daily_dir}/issue-column.json
 mv issue-size-${ts}.json ${daily_dir}/issue-size.json

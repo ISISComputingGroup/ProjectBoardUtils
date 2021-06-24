@@ -230,6 +230,13 @@ ms_dict['DUE'] = current_milestone.due_on.isoformat()
 
 print("INFO: Current milestone target {SP} SP and is due on {DUE}".format(**ms_dict))
 
+# format is SPRINT_YY_MM_DD
+try:
+    ms_parts = current_milestone.title.split('_')
+    ms_dict['START'] = '-'.join(ms_parts[1:])
+except:
+    ms_dict['START'] = '1970-01-01'
+
 with open('milestone.json', 'w') as f:
     json.dump(ms_dict, f)
 

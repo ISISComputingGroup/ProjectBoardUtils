@@ -16,32 +16,37 @@ try:
         ms_dict = json.load(f)
     target_sp = ms_dict['SP']
     due_on = datetime.datetime.fromisoformat(ms_dict['DUE']).date()
+    start_on = datetime.datetime.fromisoformat(ms_dict['START']).date()
 except:
     target_sp = 0
     due_on = datetime.datetime.now().date()
+    start_on = datetime.datetime.fromisoformat('1970-01-01').date()
 
 ## sprint length and number of days so far
 ## will cange to calculate using spriunt end date on milestone
 ntot = 28
-ncurr = len(df['Date'])
-first_day = datetime.date.fromisoformat(df['Date'][0])
+start_index = 0
+while datetime.date.fromisoformat(df['Date'][start_index]) < start_on:
+    start_index = start_index + 1
+first_day = datetime.date.fromisoformat(df['Date'][start_index])
 ntot = (due_on - first_day).days + 1
 
 ## completed burndown
-burndown = df['Review Complete'].values
+ncurr = len(df['Date'][start_index:])
+burndown = df['Review Complete'].values[start_index:]
 burndown = np.full((ncurr), target_sp) - burndown
 last_val = burndown[ncurr-1]
 burndown = np.append(burndown, np.full((ntot-ncurr), last_val))
 
 ## review + completed burndown
-rev = df['Review'].values
+rev = df['Review'].values[start_index:]
 last_val = rev[ncurr-1]
 rev = np.append(rev, np.full((ntot-ncurr), last_val))
 burndown_rev = burndown - rev
 
 ## date axis
-last_day = datetime.date.fromisoformat(df['Date'][ncurr-1])
-dates = df['Date']
+last_day = datetime.date.fromisoformat(df['Date'][start_index+ncurr-1])
+dates = df['Date'][start_index:]
 for i in range(1, ntot - ncurr + 1):
     dates = np.append(dates, [(last_day + datetime.timedelta(days=i)).isoformat()])
 
@@ -49,7 +54,7 @@ for i in range(1, ntot - ncurr + 1):
 if target_sp > 0:
     initial = target_sp
 else:
-    initial = df['Points Sum'][0]
+    initial = df['Points Sum'][start_index]
 rate = initial / (ntot-1.0)
 ideal = []
 for i in range(ntot):
