@@ -2,3 +2,4 @@ gitpython
 PyGithub
 plotly
 pandas
+regex
