@@ -89,6 +89,8 @@ def get_all_info_for_PRs(repository, file_changed):
     prs = []
     for pr in release_notes_prs:
         title, content, files_changed = pr.title, pr.body, pr.get_files()
+        if content is None:
+            content = ''
         changes_made = [file.patch for file in files_changed if os.path.basename(file.filename) == file_changed]
         changes_made = "" if not changes_made else changes_made[0]
         prs.append((title, content, changes_made))
