@@ -49,7 +49,7 @@ def check_for_dangling_release_notes(repository):
                     ticket_number = re.search(regex, pr[1]).group()
         if ticket_number and repository.get_issue(int(ticket_number)).state == "closed":
             in_error = True
-            print(f"Warning: issue {ticket_number} is closed but its associated Release note PR titled "
+            print(f"ERROR: issue {ticket_number} is closed but its associated Release note PR titled "
                   f"\"{pr[0]}\" is open")
 
     return in_error
