@@ -1,5 +1,6 @@
 from utils import *
 import sys
+import regex as re
 
 RELEASE_NOTES_REPO_PATH = "release_notes_repo"
 RELEASE_NOTES_FOLDER = "release_notes"
@@ -32,6 +33,26 @@ def check_review_in_prs(repository, column_dict):
             print(f"ERROR: issue {ticket_number} has no PR modifying release notes ({ticket.html_url}, assigned: {get_assigned(ticket)})")
     return in_error
 
+def check_for_dangling_release_notes(repository):
+    """
+    A release note is considered dangling release note when its corresponding issue is closed.
+    Returns: error or not
+    """
+    in_error = False
+    prs = get_all_info_for_PRs(repository, UPCOMING_CHANGES_FILE)
+    regex_list = ["(?i:Ticket |Ticket|#)\K\d+", "([0-9]+)(?=[^\/]*$)"]
+    for pr in prs:
+        ticket_number = re.search(regex_list[0], pr[0]).group() if re.search(regex_list[0], pr[0]) else None
+        if not ticket_number and pr[1]:
+            for regex in regex_list:
+                if re.search(regex, pr[1]):
+                    ticket_number = re.search(regex, pr[1]).group()
+        if ticket_number and repository.get_issue(int(ticket_number)).state == "closed":
+            in_error = True
+            print(f"ERROR: issue {ticket_number} is closed but its associated Release note PR titled "
+                  f"\"{pr[0]}\" is open")
+
+    return in_error
 
 def check_complete_in_a_file(column_dict):
     in_error = False
@@ -55,8 +76,8 @@ def main():
     project_board_repository = get_IBEX_repo()
     columns = get_project_columns(project_board_repository, "IBEX Project Board")
     column_dict = sort_cards_into_columns(columns)
-
-    in_error = check_review_in_prs(project_board_repository, column_dict)
+    in_error = check_for_dangling_release_notes(project_board_repository)
+    in_error |= check_review_in_prs(project_board_repository, column_dict)
     in_error |= check_complete_in_a_file(column_dict)
     return in_error
 
