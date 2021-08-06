@@ -79,7 +79,7 @@ def main():
     in_error = check_for_dangling_release_notes(project_board_repository)
     in_error |= check_review_in_prs(project_board_repository, column_dict)
     in_error |= check_complete_in_a_file(column_dict)
-    return
+    return in_error
 
 
 if __name__ == '__main__':
