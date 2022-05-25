@@ -59,7 +59,7 @@ def check_column_label(labels, label, issue):
     check_labels(labels, no_labels, issue, False)
 
 
-def check_if_stale(issue, label_name, days_allowed, assigned):
+def check_if_stale(issue, label_name, warn_days_allowed, error_days_allowed, assigned):
     created = None
     for event in issue.get_events(): # or get_timeline() and '
 #        if event.event == 'moved_columns_in_project' and event.column_name == 'Review':
@@ -68,7 +68,9 @@ def check_if_stale(issue, label_name, days_allowed, assigned):
             created = event.created_at
     if created is not None:
         dur = datetime.datetime.now() - created
-        if dur > datetime.timedelta(days_allowed):
+        if dur > datetime.timedelta(error_days_allowed):
+            print_warning('ERROR: Issue {} has been in "{}" for {} days (assigned: {})'.format(issue.number, label_name, dur.days, assigned))
+        elif dur > datetime.timedelta(warn_days_allowed):
             print_warning('WARNING: Issue {} has been in "{}" for {} days (assigned: {})'.format(issue.number, label_name, dur.days, assigned))
 
 
@@ -179,13 +181,14 @@ for github_column in columns:
             if column is COLUMNS.READY:
                 check_column_label(labels, 'ready', issue)
                 check_labels(labels, ['proposal'], issue, False)
-                check_if_stale(issue, 'rework', 7, assigned)
+                check_if_stale(issue, 'rework', 7, 28, assigned)
             if column is COLUMNS.IN_PROGRESS:
                 check_column_label(labels, 'in progress', issue)
-                check_if_stale(issue, 'in progress', 7, assigned)
+                check_if_stale(issue, 'in progress', 7, 28, assigned)
             if column is COLUMNS.REVIEW:
                 check_column_label(labels, 'review', issue)
-                check_if_stale(issue, 'review', 7, assigned)
+                check_if_stale(issue, 'review', 7, 28, assigned)
+                check_if_stale(issue, 'under review', 7, 28, assigned)
             # if column is COLUMNS.COMPLETE:
             #    check_column_label(labels, 'completed', issue)
             # if column is COLUMNS.DONE:
