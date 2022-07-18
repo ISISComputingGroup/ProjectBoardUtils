@@ -184,7 +184,7 @@ for github_column in columns:
                 check_if_stale(issue, 'rework', 7, 28, assigned)
             if column is COLUMNS.IN_PROGRESS:
                 check_column_label(labels, 'in progress', issue)
-                check_if_stale(issue, 'in progress', 7, 28, assigned)
+                check_if_stale(issue, 'in progress', 14, 2800, assigned)
             if column is COLUMNS.REVIEW:
                 check_column_label(labels, 'review', issue)
                 check_if_stale(issue, 'review', 7, 28, assigned)
