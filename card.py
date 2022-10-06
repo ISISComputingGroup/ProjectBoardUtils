@@ -22,7 +22,7 @@ args = parser.parse_args()
 WORKFLOW_LABELS = ['bucket', 'ready', 'in progress', 'review',
                    'completed', 'awaiting', 'impeded']
 POINTSUM_COLUMNS = [COLUMNS.READY, COLUMNS.IN_PROGRESS, COLUMNS.REVIEW, COLUMNS.COMPLETE, COLUMNS.IMPEDED]
-ZERO_POINT_LABELS = {'training', 'HLM', 'Cryomagnet', 'Friday',
+ZERO_POINT_LABELS = {'Good First Issue', 'HLM', 'Cryomagnet', 'Friday',
                      'Datastreaming', 'standdown', 'support'}
 NO_POINT_LABELS = {'support', 'duplicate', 'sub-ticket', 'umbrella', 'wontfix'}
 
