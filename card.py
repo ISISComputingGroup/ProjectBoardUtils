@@ -188,7 +188,8 @@ for github_column in columns:
             if column is COLUMNS.REVIEW:
                 check_column_label(labels, 'review', issue)
                 check_if_stale(issue, 'review', 7, 28, assigned)
-                check_if_stale(issue, 'under review', 7, 28, assigned)
+                if "under review" in issue.labels:
+                    check_if_stale(issue, 'under review', 7, 28, assigned)
             # if column is COLUMNS.COMPLETE:
             #    check_column_label(labels, 'completed', issue)
             # if column is COLUMNS.DONE:
