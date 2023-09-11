@@ -45,12 +45,12 @@ def check_labels(labels, check, issue, present):
     if present:
         diff = set(check).difference(labels)
         if len(diff) > 0:
-            print_error('ERROR: issue {} does NOT have the following required labels: {} (assigned: {})'
-                        .format(issue.number, ','.join(diff),assigned))
+            print_error('ERROR: issue {} ({}) does NOT have the following required labels: {} (assigned: {})'
+                        .format(issue.number, issue.title, ','.join(diff),assigned))
     if not present:
         diff = labels.intersection(set(check))
         if len(diff) > 0:
-            print_error('ERROR: issue {} has the following INVALID labels: {} (assigned: {})'.format(issue.number, ','.join(diff), assigned))
+            print_error('ERROR: issue {} ({}) has the following INVALID labels: {} (assigned: {})'.format(issue.number, issue.title, ','.join(diff), assigned))
 
 
 def check_column_label(labels, label, issue):
@@ -69,9 +69,9 @@ def check_if_stale(issue, label_name, warn_days_allowed, error_days_allowed, ass
     if created is not None:
         dur = datetime.datetime.now() - created
         if dur > datetime.timedelta(error_days_allowed):
-            print_warning('ERROR: Issue {} has been in "{}" for {} days (assigned: {})'.format(issue.number, label_name, dur.days, assigned))
+            print_warning('ERROR: Issue {} ({}) has been in "{}" for {} days (assigned: {})'.format(issue.number, issue.title, label_name, dur.days, assigned))
         elif dur > datetime.timedelta(warn_days_allowed):
-            print_warning('WARNING: Issue {} has been in "{}" for {} days (assigned: {})'.format(issue.number, label_name, dur.days, assigned))
+            print_warning('WARNING: Issue {} ({}) has been in "{}" for {} days (assigned: {})'.format(issue.number, issue.title, label_name, dur.days, assigned))
 
 
 repo = get_IBEX_repo()
@@ -138,24 +138,24 @@ for github_column in columns:
                     ready = True
                 if label.name.isdigit():
                     if found_size:
-                        print_error("ERROR: issue {} has multiple sizes (assigned: {})".format(issue.number, assigned))
+                        print_error("ERROR: issue {} ({}) has multiple sizes (assigned: {})".format(issue.number, issue.title, assigned))
                     else:
                         size = int(label.name)
                         found_size = True
             if size is None:
                 no_labels = NO_POINT_LABELS.intersection(labels)
                 if len(no_labels) > 0:
-                    print("INFO: no size {} issue {}".format(','.join(no_labels), issue.number))
+                    print("INFO: no size {} issue {} ({})".format(','.join(no_labels), issue.number, issue.title))
                 elif is_bucket:
                     pass
                 else:
-                    print_error("ERROR: no size for issue {} in {} (assigned: {})".format(issue.number, column, assigned))
+                    print_error("ERROR: no size for issue {} ({}) in {} (assigned: {})".format(issue.number, issue.title, column, assigned))
             elif size == 0:
                 zero_labels = ZERO_POINT_LABELS.intersection(labels)
                 if len(zero_labels) > 0:
                     print("INFO: size 0 {} issue {}".format(','.join(zero_labels), issue.number))
                 else:
-                    print_error("ERROR: size 0 not allowed for issue {} (assigned: {})".format(issue.number, assigned))
+                    print_error("ERROR: size 0 not allowed for issue {} ({}) (assigned: {})".format(issue.number, issue.title, assigned))
             else:
                 if added_during_sprint:
                     points_added_during_sprint += size
@@ -167,13 +167,13 @@ for github_column in columns:
                 issue_size[issue.number] = size
             issue_column[issue.number] = column
             if is_bucket and issue.milestone is not None:
-                print_error("ERROR: issue {} has milestone {} (assigned: {})".format(issue.number, issue.milestone.title, get_assigned(issue)))
+                print_error("ERROR: issue {} ({}) has milestone {} (assigned: {})".format(issue.number, issue.title, issue.milestone.title, get_assigned(issue)))
             if not is_bucket and issue.milestone is None:
-                print_error("ERROR: issue {} has no milestone (assigned: {})".format(issue.number, assigned))
+                print_error("ERROR: issue {} ({}) has no milestone (assigned: {})".format(issue.number, issue.title, assigned))
             if not is_bucket and issue.milestone is not None and issue.milestone.state == "open":
                 milestones.append(issue.milestone.title)
             if (issue.milestone is not None) and (issue.milestone.state == 'closed'):
-                print_error("ERROR: issue {} has a closed milestone (assigned: {})".format(issue.number, assigned))
+                print_error("ERROR: issue {} ({}) has a closed milestone (assigned: {})".format(issue.number, issue.title, assigned))
             if column is COLUMNS.UNKNOWN:
                 check_labels(labels, ['rework'], issue, False)
             if column is COLUMNS.BUCKET:
@@ -203,7 +203,7 @@ for github_column in columns:
 #            if addigned != 'None' and column.name in [ 'Bucket' ]:
 #                print_error("ERROR: issue {} cannot be assigned to {}".format(issue.number,assigned))
             if assigned == 'None' and column in [COLUMNS.IN_PROGRESS, COLUMNS.REVIEW, COLUMNS.COMPLETE]:
-                print_error("ERROR: issue {} must be assigned to somebody".format(issue.number))
+                print_error("ERROR: issue {} ({}) must be assigned to somebody".format(issue.number, issue.title))
         else:
             pr = card.get_content()
             print_error("ERROR: pullrequest {} not allowed".format(pr.number))
@@ -249,13 +249,13 @@ for milestone in open_milestones:
         milestone_issues = repo.get_issues(milestone=milestone, state='all')
         for issue in milestone_issues:
             if issue.number in issue_column:
-                print_error("ERROR: issue {} ({}, assigned: {}) has old milestone {}".format(issue.number, issue.state, get_assigned(issue), milestone.title))
+                print_error("ERROR: issue {} ({}) ({}, assigned: {}) has old milestone {}".format(issue.number, issue.title, issue.state, get_assigned(issue), milestone.title))
 
 if args.milestone:
     milestone_issues = repo.get_issues(milestone=current_milestone, state='all')
     for issue in milestone_issues:
         if issue.number not in issue_column:
-            print_error("ERROR: issue {} ({}, assigned: {}) has current milestone but is not on board".format(issue.number, issue.state, get_assigned(issue)))
+            print_error("ERROR: issue {} ({}) ({}, assigned: {}) has current milestone but is not on board".format(issue.number, issue.title, issue.state, get_assigned(issue)))
 
 print("")
 
