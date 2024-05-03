@@ -67,7 +67,7 @@ fig = go.Figure(go.Scatter(x=dates, y=burndown, name='Completed',
                 #layout_title_text='Sprint Burndown'
 fig.add_scatter(x=dates, y=ideal, name='Completed (Ideal)',
                 line_color='green', mode="lines")
-fig.add_scatter(x=dates, y=burndown_rev, name='Review+Completed',
+fig.add_scatter(x=dates, y=burndown_rev, name='Review + Completed',
                 line=dict(color='blue', width=1, dash='dash'))
 fig.update_layout(showlegend=True)
 fig.write_html('burndown-points.html')
