@@ -33,7 +33,7 @@ ntot = (due_on - first_day).days + 1
 
 ## completed burndown
 ncurr = len(df['Date'][start_index:])
-burndown = df['Review Complete'].values[start_index:]
+burndown = df['Complete'].values[start_index:]
 burndown = np.full((ncurr), target_sp) - burndown
 last_val = burndown[ncurr-1]
 burndown = np.append(burndown, np.full((ntot-ncurr), last_val))
