@@ -12,7 +12,7 @@ class COLUMNS(Enum):
     READY = "Ready"
     IN_PROGRESS = "In Progress"
     REVIEW = "Review"
-    COMPLETE = "Review Complete"
+    COMPLETE = "Complete"
     DONE = "Done"
     IMPEDED = "Impeded"
     UNKNOWN = "Unknown"
