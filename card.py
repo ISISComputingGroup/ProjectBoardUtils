@@ -67,7 +67,7 @@ def check_if_stale(issue, label_name, warn_days_allowed, error_days_allowed, ass
         if event.event == 'labeled' and event.label.name == label_name:
             created = event.created_at
     if created is not None:
-        dur = datetime.datetime.now() - created
+        dur = datetime.datetime.now(datetime.UTC) - created
         if dur > datetime.timedelta(error_days_allowed):
             print_warning('ERROR: Issue {} ({}) has been in "{}" for {} days (assigned: {})'.format(issue.number, issue.title, label_name, dur.days, assigned))
         elif dur > datetime.timedelta(warn_days_allowed):
