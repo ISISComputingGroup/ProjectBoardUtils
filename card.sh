@@ -1,12 +1,12 @@
 #!/bin/sh
-export PYTHONPATH=/home/faa59/card
+export PYTHONPATH=/home/isissupport/card
 
-. /home/faa59/card/venv/bin/activate
+. /home/isissupport/card/venv/bin/activate
 
 ## check default ibex project board
-python3 /home/faa59/card/card.py --milestone
+python3 /home/isissupport/card/card.py --milestone
 
-python3 /home/faa59/card/release_notes_checker.py
+python3 /home/isissupport/card/release_notes_checker.py
 
 ## check other boards
-#python3 /home/faa59/card/card.py --project="Reflectometry"
+#python3 /home/isissupport/card/card.py --project="Reflectometry"

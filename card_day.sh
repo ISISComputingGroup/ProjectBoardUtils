@@ -1,7 +1,7 @@
 #!/bin/sh
-export PYTHONPATH=/home/faa59/card
+export PYTHONPATH=/home/isissupport/card
 
-cd /home/faa59/card
+cd /home/isissupport/card
 
 . ./venv/bin/activate
 
@@ -14,13 +14,13 @@ daily_dir=/isis/www/ibex/daily/$year/$month/$day
 mkdir -p ${daily_dir}
 
 ## check default ibex project board
-python3 /home/faa59/card/card.py --milestone --data > summary.txt
+python3 /home/isissupport/card/card.py --milestone --data > summary.txt
 
 ## check release notes
-python3 /home/faa59/card/release_notes_checker.py > release_notes_check.txt
+python3 /home/isissupport/card/release_notes_checker.py > release_notes_check.txt
 
 ## make burndown graph
-python3 /home/faa59/card/make_fig.py
+python3 /home/isissupport/card/make_fig.py
 
 ## update web files
 cp -f release_notes_check.txt summary.txt tickets.csv burndown-tickets.csv burndown-points.csv burndown-points.html /isis/www/ibex
