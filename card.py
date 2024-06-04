@@ -196,6 +196,7 @@ for github_column in columns:
             #     check_column_label(labels, 'completed', issue)
             if column is COLUMNS.IMPEDED:
                 check_column_label(labels, 'impeded', issue)
+                check_if_stale(issue, 'impeded', 7, 28, assigned)
             if in_rework and column in [COLUMNS.READY, COLUMNS.IN_PROGRESS, COLUMNS.IMPEDED]:
                 current_rework += 1
             if in_rework and column in [COLUMNS.REVIEW, COLUMNS.COMPLETE, COLUMNS.DONE]:
