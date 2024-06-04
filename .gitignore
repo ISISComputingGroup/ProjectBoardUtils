@@ -1,6 +1,7 @@
 local_defs.py
 __pycache__/
 *.py[cod]
+old_csv/
 burndown-points.csv
 burndown-points.html
 burndown-tickets.csv
