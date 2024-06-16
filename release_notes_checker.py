@@ -40,7 +40,7 @@ def check_for_dangling_release_notes(repository):
     """
     in_error = False
     prs = get_all_info_for_PRs(repository, UPCOMING_CHANGES_FILE)
-    regex_list = ["(?i:Ticket |Ticket|#)\K\d+", "([0-9]+)(?=[^\/]*$)"]
+    regex_list = [r'(?i:Ticket |Ticket|#)\K\d+', r'([0-9]+)(?=[^\/]*$)']
     for pr in prs:
         ticket_number = re.search(regex_list[0], pr[0]).group() if re.search(regex_list[0], pr[0]) else None
         if not ticket_number and pr[1]:

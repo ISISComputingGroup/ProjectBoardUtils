@@ -11,3 +11,4 @@ summary.txt
 tickets.csv
 release_notes_check.txt
 release_notes_repo/
+issue-*.json
