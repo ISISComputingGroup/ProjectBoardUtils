@@ -73,6 +73,20 @@ def check_if_stale(issue, label_name, warn_days_allowed, error_days_allowed, ass
         elif dur > datetime.timedelta(warn_days_allowed):
             print_warning('WARNING: Issue {} ({}) has been in "{}" for {} days (assigned: {})'.format(issue.number, issue.title, label_name, dur.days, assigned))
 
+def check_recent_comments(issue):
+    comments = issue.get_comments()
+    most_recent_comment = None
+    for comment in comments:
+        if most_recent_comment is None or comment.updated_at > most_recent_comment.updated_at:
+            most_recent_comment = comment
+    if most_recent_comment:
+        most_recent_user = most_recent_comment.user
+        # time ago comment was made
+        days_ago = (datetime.datetime.now(datetime.UTC) -
+                    most_recent_comment.updated_at).days
+        print(f"Most recent comment by {most_recent_user.login}, {days_ago} days ago")
+    else:
+        print("No comments found")
 
 repo = get_IBEX_repo()
 columns = get_project_columns(repo, args.project)
@@ -196,6 +210,8 @@ for github_column in columns:
             #     check_column_label(labels, 'completed', issue)
             if column is COLUMNS.IMPEDED:
                 check_column_label(labels, 'impeded', issue)
+                check_if_stale(issue, 'impeded', 0, 28, assigned)
+                check_recent_comments(issue)
             if in_rework and column in [COLUMNS.READY, COLUMNS.IN_PROGRESS, COLUMNS.IMPEDED]:
                 current_rework += 1
             if in_rework and column in [COLUMNS.REVIEW, COLUMNS.COMPLETE, COLUMNS.DONE]:
