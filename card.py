@@ -77,11 +77,14 @@ def check_recent_comments(issue):
     comments = issue.get_comments()
     most_recent_comment = None
     for comment in comments:
-        if most_recent_comment is None or comment.created_at > most_recent_comment.created_at:
+        if most_recent_comment is None or comment.updated_at > most_recent_comment.updated_at:
             most_recent_comment = comment
     if most_recent_comment:
         most_recent_user = most_recent_comment.user
-        print(f"Most recent comment by {most_recent_user.login}: {most_recent_comment.body}")
+        # time ago comment was made
+        days_ago = (datetime.datetime.now(datetime.UTC) -
+                    most_recent_comment.updated_at).days
+        print(f"Most recent comment by {most_recent_user.login}, {days_ago} days ago")
     else:
         print("No comments found")
 
