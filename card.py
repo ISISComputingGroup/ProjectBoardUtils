@@ -80,7 +80,6 @@ def check_recent_comments(issue, error_days_allowed):
         if most_recent_comment is None or comment.updated_at > most_recent_comment.updated_at:
             most_recent_comment = comment
     if most_recent_comment:
-        most_recent_user = most_recent_comment.user
         # time ago comment was made
         days_ago = (datetime.datetime.now(datetime.UTC) -
                     most_recent_comment.updated_at).days
