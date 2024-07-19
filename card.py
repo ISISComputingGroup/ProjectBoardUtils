@@ -222,7 +222,10 @@ for github_column in columns:
                 print_error("ERROR: issue {} ({}) must be assigned to somebody".format(issue.number, issue.title))
         else:
             pr = card.get_content()
-            print_error("ERROR: pullrequest {} not allowed".format(pr.number))
+            try:
+                print_error("ERROR: pullrequest {} not allowed".format(pr.number))
+            except AttributeError:
+                print_error("ERROR: Cards present on board instead of IBEX issues")
     print("INFO: column \"{}\" contains {} cards and {} points\n".format(column, cards.totalCount, total))
     column_points[column] = total
 
