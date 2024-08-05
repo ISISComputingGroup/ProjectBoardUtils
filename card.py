@@ -1,15 +1,17 @@
 """
 project board scan
 """
+import argparse
+import datetime
+import json
 import os
 import sys
-import json
-import argparse
-from statistics import mode
-import datetime
 from datetime import date
+from statistics import mode
+
 from github import Issue
-from utils import get_IBEX_repo, get_project_columns, COLUMNS, get_assigned
+
+from utils import COLUMNS, get_assigned, get_IBEX_repo, get_project_columns
 
 parser = argparse.ArgumentParser(description='projects')
 parser.add_argument('--project', dest='project', default='IBEX Project Board')

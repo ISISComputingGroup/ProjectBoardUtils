@@ -1,10 +1,10 @@
-from local_defs import GITHUB_TOKEN
-from github import Github, Repository
-from enum import Enum
-from github import Issue
-import os
 import glob
-from git import Git, Repo, InvalidGitRepositoryError, NoSuchPathError
+import os
+from enum import Enum
+
+from git import Git, InvalidGitRepositoryError, NoSuchPathError, Repo
+from github import Github, Issue, Repository
+from local_defs import GITHUB_TOKEN
 
 
 class COLUMNS(Enum):

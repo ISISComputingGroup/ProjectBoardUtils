@@ -1,6 +1,8 @@
-from utils import *
 import sys
+
 import regex as re
+
+from utils import *
 
 RELEASE_NOTES_REPO_PATH = "release_notes_repo"
 RELEASE_NOTES_FOLDER = "release_notes"

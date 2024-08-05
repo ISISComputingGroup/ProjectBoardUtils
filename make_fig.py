@@ -1,8 +1,9 @@
 """
 generate graph
 """
-import json
 import datetime
+import json
+
 import numpy as np
 import pandas as pd
 import plotly.graph_objects as go

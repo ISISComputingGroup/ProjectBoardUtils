@@ -1,5 +1,6 @@
 import unittest
 from unittest.mock import MagicMock
+
 from utils import get_all_info_for_PRs, ticket_mentioned_in_pr
 
 
