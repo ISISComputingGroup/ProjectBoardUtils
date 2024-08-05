@@ -1,10 +1,10 @@
-from local_defs import GITHUB_TOKEN
-from github import Github, Repository
-from enum import Enum
-from github import Issue
-import os
 import glob
-from git import Git, Repo, InvalidGitRepositoryError, NoSuchPathError
+import os
+from enum import Enum
+
+from git import Git, InvalidGitRepositoryError, NoSuchPathError, Repo
+from github import Github, Issue, Repository
+from local_defs import GITHUB_TOKEN
 
 
 class COLUMNS(Enum):
@@ -53,7 +53,9 @@ def get_project_columns(repo: Repository, project_board_name):
     Return:
         The columns
     """
-    found_projects = [project for project in repo.get_projects() if project.name == project_board_name]
+    found_projects = [
+        project for project in repo.get_projects() if project.name == project_board_name
+    ]
 
     if len(found_projects) != 1:
         raise KeyError(f"{project_board_name} not found in IBEX repo")
@@ -90,8 +92,10 @@ def get_all_info_for_PRs(repository, file_changed):
     for pr in release_notes_prs:
         title, content, files_changed = pr.title, pr.body, pr.get_files()
         if content is None:
-            content = ''
-        changes_made = [file.patch for file in files_changed if os.path.basename(file.filename) == file_changed]
+            content = ""
+        changes_made = [
+            file.patch for file in files_changed if os.path.basename(file.filename) == file_changed
+        ]
         changes_made = "" if not changes_made else changes_made[0]
         prs.append((title, content, changes_made))
 
@@ -105,7 +109,9 @@ def ticket_mentioned_in_pr(ticket_number, pr_infos):
     contains_ticket_number_in_title = []
     for pr_details in pr_infos:
         contains_ticket_number_in_title.append(str(ticket_number) in pr_details[0])
-        contains_ticket_number_anywhere.extend([str(ticket_number) in info for info in pr_details[1:]])
+        contains_ticket_number_anywhere.extend(
+            [str(ticket_number) in info for info in pr_details[1:]]
+        )
     return any(contains_ticket_number_in_title), any(contains_ticket_number_anywhere)
 
 
@@ -143,15 +149,16 @@ def get_text_with_extension(folder_path, file_extension):
             contents += file.read()
     return contents
 
+
 # get names who are assigned to an issue
 # we use login rather than name attribute as name may not be set
 def get_assigned(issue):
     assigned = [x.login for x in issue.assignees]
     if issue.assignee is not None:
         assigned.append(issue.assignee.login)
-    assigned = [x if x is not None else 'None' for x in assigned]
+    assigned = [x if x is not None else "None" for x in assigned]
     assigned = set(assigned)
     if len(assigned) > 0:
-        return ','.join(assigned)
+        return ",".join(assigned)
     else:
-        return 'None'
+        return "None"
